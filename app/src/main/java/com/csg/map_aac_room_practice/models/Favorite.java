@@ -4,6 +4,7 @@ public class Favorite {
     private int id;
     private String address = "asdasd";
     private String memo = "asdadas";
+    private String name = "asdasdasdasdad";
     private double longitude;
     private double latitude;
 
@@ -21,6 +22,14 @@ public class Favorite {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getMemo() {

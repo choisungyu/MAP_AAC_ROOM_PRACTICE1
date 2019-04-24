@@ -39,7 +39,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     // Create a new Places client instance.
     private PlacesClient mPlacesClient;
-    
 
 
     public MapFragment() {
@@ -66,16 +65,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
+        //----------autocompleteFragment
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+        autocompleteFragment.setPlaceFields(Arrays.asList(
+                Place.Field.ID,
+                Place.Field.NAME,
+                Place.Field.PHOTO_METADATAS,
+                Place.Field.LAT_LNG,
+                Place.Field.ADDRESS));
 
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
                 // TODO: Get info about the selected place.
-                Log.i(TAG, "Place: " + place.toString());
+                Log.d(TAG, "Place: " + place.toString());
+
+                LatLng selectedPlace = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
+                mMap.addMarker(new MarkerOptions().position(selectedPlace)
+                        .title(place.getName()));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(selectedPlace));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selectedPlace,15.0f));
+
             }
 
             @Override
@@ -84,14 +97,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 Log.i(TAG, "An error occurred: " + status);
             }
         });
+
+        //----------autocompleteFragment
+
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+        // TODO : 현재위치로 이동
     }
 }
