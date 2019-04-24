@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -14,12 +15,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.csg.map_aac_room_practice.R;
+import com.csg.map_aac_room_practice.databinding.InfowindowBinding;
+import com.csg.map_aac_room_practice.models.Favorite;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -39,6 +43,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     // Create a new Places client instance.
     private PlacesClient mPlacesClient;
+    private Favorite mFavorite;
 
 
     public MapFragment() {
@@ -83,11 +88,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 // TODO: Get info about the selected place.
                 Log.d(TAG, "Place: " + place.toString());
 
+                mFavorite = new Favorite();
+                mFavorite.setAddress(place.getAddress());
+                mFavorite.setName(place.getName());
+                if (place.getLatLng() != null) {
+
+                    mFavorite.setLatitude(place.getLatLng().latitude);
+                    mFavorite.setLongitude(place.getLatLng().longitude);
+                }
+
+
                 LatLng selectedPlace = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
-                mMap.addMarker(new MarkerOptions().position(selectedPlace)
-                        .title(place.getName()));
+                MarkerOptions markerOptions = new MarkerOptions().position(selectedPlace)
+                        .snippet(place.getAddress())
+                        .title(place.getName());
+                mMap.addMarker(markerOptions);
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(selectedPlace));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selectedPlace,15.0f));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selectedPlace, 15.0f));
 
             }
 
@@ -105,6 +122,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        // InfoWindow
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+                // 이거 다시 보기
+                View view = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.infowindow, (ViewGroup) getView(), false);
+
+                InfowindowBinding binding = InfowindowBinding.bind(view);
+                binding.setFavorite(mFavorite);
+                return view;
+            }
+        });
 
 
         // TODO : 현재위치로 이동
