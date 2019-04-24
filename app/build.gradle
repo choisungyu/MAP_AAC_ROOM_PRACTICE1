@@ -34,6 +34,9 @@ dependencies {
     // For Kotlin use navigation-fragment-ktx
     implementation "androidx.navigation:navigation-ui:$nav_version"
     // For Kotlin use navigation-ui-ktx
+
+    implementation 'com.google.android.libraries.places:places:1.1.0'
+
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
