@@ -13,7 +13,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.csg.map_aac_room_practice.MapInfoFragment;
 import com.csg.map_aac_room_practice.R;
 import com.csg.map_aac_room_practice.databinding.InfowindowBinding;
 import com.csg.map_aac_room_practice.models.Favorite;
@@ -22,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -50,6 +55,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Required empty public constructor
     }
 
+    // places api 초기화 할 때, 생성자에 넣을라고 했을 때 안되서 onAttach 만들고 여기다가 노놓은거 같음
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -99,9 +105,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
                 LatLng selectedPlace = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
-                MarkerOptions markerOptions = new MarkerOptions().position(selectedPlace)
-                        .snippet(place.getAddress())
-                        .title(place.getName());
+                MarkerOptions markerOptions = new MarkerOptions().position(selectedPlace);
+//                        .snippet(place.getAddress())
+//                        .title(place.getName());
+//                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
                 mMap.addMarker(markerOptions);
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(selectedPlace));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selectedPlace, 15.0f));
@@ -117,12 +124,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         //----------autocompleteFragment
 
+
     }
 
+    // map 에서 customizing 하는 곳
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        // DialogFragment
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                MapInfoFragment.newInstance(mFavorite).show(getChildFragmentManager(),"dialog");
+                return false;
+            }
+        });
+        
         // InfoWindow
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
@@ -136,9 +154,28 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 View view = LayoutInflater.from(requireContext())
                         .inflate(R.layout.infowindow, (ViewGroup) getView(), false);
 
-                InfowindowBinding binding = InfowindowBinding.bind(view);
-                binding.setFavorite(mFavorite);
-                return view;
+//                InfowindowBinding binding = InfowindowBinding.bind(view);
+//                binding.setFavorite(mFavorite);
+//                return binding.getRoot();
+                TextView nameTextView = view.findViewById(R.id.name_text);
+                TextView addressTextView = view.findViewById(R.id.address_text);
+                TextView latlngTextView = view.findViewById(R.id.latlng_text);
+                EditText memoTextView = view.findViewById(R.id.memo_edit);
+
+                nameTextView.setText(mFavorite.getName());
+                addressTextView.setText(mFavorite.getAddress());
+                latlngTextView.setText(mFavorite.getLatitude() + ", " + mFavorite.getLongitude());
+                memoTextView.setText(mFavorite.getMemo());
+
+//                return view;
+                view.findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(requireContext(), "asdasd", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+                return null;
             }
         });
 

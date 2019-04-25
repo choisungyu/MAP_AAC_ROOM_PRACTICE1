@@ -1,6 +1,8 @@
 package com.csg.map_aac_room_practice.models;
 
-public class Favorite {
+import java.io.Serializable;
+
+public class Favorite implements Serializable {
     private int id;
     private String address = "asdasd";
     private String memo = "asdadas";
